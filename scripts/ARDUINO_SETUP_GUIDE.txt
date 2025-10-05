@@ -1,0 +1,60 @@
+🚀 ARDUINO SERIAL SETUP GUIDE
+=============================
+
+STEP 1: Hardware Setup
+----------------------
+Connect HC-SR04 Ultrasonic Sensor to Arduino:
+  - VCC  → 5V
+  - GND  → GND
+  - Trig → Pin 9
+  - Echo → Pin 10
+
+STEP 2: Upload Arduino Code
+---------------------------
+1. Open Arduino IDE
+2. Copy code from: scripts/arduino_serial_simple.ino
+3. Select your Arduino board (Tools → Board)
+4. Select correct port (Tools → Port)
+5. Click Upload button
+6. Open Serial Monitor (Tools → Serial Monitor) to test
+7. Set baud rate to 9600
+8. Wave your hand in front of sensor - should see "TRIGGERED"
+
+STEP 3: Find Your Serial Port
+-----------------------------
+Windows:  COM3, COM4, etc. (check Device Manager)
+Mac:      /dev/cu.usbserial-XXXX or /dev/cu.usbmodem-XXXX
+Linux:    /dev/ttyUSB0 or /dev/ttyACM0
+
+To list all ports:
+  python -m serial.tools.list_ports
+
+STEP 4: Setup Python Backend
+----------------------------
+1. Install dependencies:
+   pip install supabase pyserial python-dotenv
+
+2. Create .env file with your Supabase credentials:
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+3. Edit scripts/python_serial_backend.py:
+   - Update SERIAL_PORT to match your Arduino port
+
+4. Run the Python script:
+   python scripts/python_serial_backend.py
+
+STEP 5: Test the System
+-----------------------
+1. Make sure SQL table is created (run 001_create_sensor_table.sql)
+2. Start Python backend: python scripts/python_serial_backend.py
+3. Open your frontend in browser
+4. Wave at ultrasonic sensor
+5. Frontend should automatically navigate to order page!
+
+TROUBLESHOOTING
+--------------
+❌ "Serial port error" → Check Arduino is connected and port is correct
+❌ "Database error" → Make sure SQL table is created and .env is configured
+❌ Sensor not detecting → Adjust DETECTION_DISTANCE in Arduino code
+❌ Multiple triggers → Increase COOLDOWN_TIME in Arduino code

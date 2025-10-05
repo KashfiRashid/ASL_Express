@@ -1,0 +1,85 @@
+ESP32 CONNECTION GUIDE
+======================
+
+Your ESP32 can connect to the Python backend in 2 ways:
+
+METHOD 1: USB SERIAL (Recommended for simplicity)
+--------------------------------------------------
+✅ Pros: Simple, reliable, no pairing needed
+⚠️ Cons: Requires USB cable
+
+Setup:
+1. Connect ESP32 to PC via USB cable
+2. Find your serial port:
+   - Windows: Device Manager → Ports (COM3, COM4, etc.)
+   - Mac: Terminal → ls /dev/cu.* (look for /dev/cu.usbserial-*)
+   - Linux: Terminal → ls /dev/ttyUSB* (usually /dev/ttyUSB0)
+
+3. Update python_serial_backend.py:
+   CONNECTION_METHOD = "SERIAL"
+   SERIAL_PORT = "COM3"  # Your port here
+
+4. Run: python python_serial_backend.py
+
+
+METHOD 2: BLUETOOTH (Wireless)
+-------------------------------
+✅ Pros: Wireless, no cables
+⚠️ Cons: Requires pairing, slightly more complex
+
+Setup:
+1. Pair ESP32 with your computer:
+   - Windows: Settings → Bluetooth → Add device
+   - Mac: System Preferences → Bluetooth → Pair
+   - Linux: bluetoothctl → scan on → pair XX:XX:XX:XX:XX:XX
+
+2. Find ESP32 MAC address:
+   - Check Bluetooth settings
+   - Or run: python -m bluetooth (if pybluez installed)
+
+3. Install PyBluez:
+   pip install pybluez
+
+4. Update python_serial_backend.py:
+   CONNECTION_METHOD = "BLUETOOTH"
+   BLUETOOTH_MAC = "XX:XX:XX:XX:XX:XX"  # Your ESP32 MAC
+
+5. Run: python python_serial_backend.py
+
+   OR use the Bluetooth-only version:
+   python python_bluetooth_only.py
+
+
+ESP32 CODE (Same for both methods)
+-----------------------------------
+Your ESP32 just needs to send "TRIGGERED" via Serial:
+
+void loop() {
+  if (sensorDetected) {
+    Serial.println("TRIGGERED");
+    // For Bluetooth, use SerialBT.println("TRIGGERED");
+  }
+}
+
+
+TROUBLESHOOTING
+---------------
+Serial not working?
+- Check port name is correct
+- Make sure no other program is using the port (Arduino IDE, etc.)
+- Try unplugging and replugging USB
+
+Bluetooth not working?
+- Make sure ESP32 is paired first
+- Check MAC address is correct (format: XX:XX:XX:XX:XX:XX)
+- On Linux, you may need to run as sudo
+- Try: pip install pybluez2 if pybluez fails
+
+
+TESTING
+-------
+1. Run the Python backend
+2. Trigger your ultrasonic sensor (wave hand)
+3. Check console for "Sensor triggered!"
+4. Check frontend - should navigate to order page
+5. Check Supabase database - sensor_status table should update
